@@ -1,4 +1,6 @@
-FROM n8nio/n8n:0.106.0-debian as builder
+ARG N8N_VERSION=0.106.0
+ARG JOPLIN_VERSION=1.6.4
+FROM n8nio/n8n:${N8N_VERSION}-debian as builder
 RUN apt-get update \
  && apt-get install -y \
         git \
@@ -10,17 +12,17 @@ RUN apt-get update \
 
 # https://github.com/nodejs/node-gyp/issues/1236#issuecomment-309447800
 USER node
-RUN NPM_CONFIG_PREFIX=/home/node/.joplin-bin npm --unsafe-perm -g install joplin
+RUN NPM_CONFIG_PREFIX=/home/node/.joplin-bin npm --unsafe-perm -g install "joplin@${JOPLIN_VERSION}"
 
 # Copy the built joplin into a clean Debian image
-FROM n8nio/n8n:0.106.0-debian as release
+FROM n8nio/n8n:${N8N_VERSION}-debian as release
+LABEL version=n8n-${N8N_VERSION}-joplin-${JOPLIN_VERSION}
 COPY --from=builder --chown=node:node /home/node/.joplin-bin /home/node/.joplin-bin
 ENV PATH=$PATH:/home/node/.joplin-bin/bin
 
 # Joplin config directory can be mounted for persistence of config and database
-# USER node
-RUN mkdir -p /home/node/.config/joplin
-RUN chown node:node /home/node/.config/joplin
+RUN mkdir -p /home/node/.config/joplin \
+ && chown node:node /home/node/.config/joplin
 VOLUME /home/node/.config/joplin
 
 # Configure Joplin by importing a JSON configuration file from a mounted volume
