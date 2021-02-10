@@ -1,15 +1,22 @@
 version: "3"
 services:
-  n8n:
-    build: .
-    image: jspiers/n8n-joplin
+  n8n-joplin:
+    build:
+      context: .
+      args:
+        N8N_VERSION: "0.107.0"
+        JOPLIN_VERSION: "1.6.4"
+    image: jspiers/n8n-joplin:0.107.0-1.6.4
     volumes:
       - ./joplin-config.json:/secrets/joplin-config.json
       - type: volume
         source: joplin-data
         target: /home/node/.config/joplin
-      - ./.n8n:/home/node/.n8n
+      - type: volume
+        source: n8n-data
+        target: /home/node/.n8n
     ports:
       - "5678:5678"
 volumes:
   joplin-data:
+  n8n-data:
