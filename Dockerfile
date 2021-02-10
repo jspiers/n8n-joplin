@@ -1,4 +1,4 @@
-ARG N8N_VERSION=0.106.0
+ARG N8N_VERSION=0.107.0
 ARG JOPLIN_VERSION=1.6.4
 FROM n8nio/n8n:${N8N_VERSION}-debian as builder
 RUN apt-get update \
