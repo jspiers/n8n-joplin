@@ -27,6 +27,6 @@ VOLUME /home/node/.config/joplin
 ENV JOPLIN_CONFIG_JSON=/secrets/joplin-config.json
 VOLUME /secrets
 # Updated entrypoint script performs "joplin config --import-file $JOPLIN_CONFIG_JSON"
-COPY --chown=node:node joplin-config-entrypoint.sh /joplin-config-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh", "/joplin-config-entrypoint.sh"]
+COPY --chown=node:node joplin-entrypoint.sh /joplin-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh", "/joplin-entrypoint.sh"]
 CMD ["n8n"]
