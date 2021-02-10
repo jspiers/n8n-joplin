@@ -10,4 +10,6 @@ else
     echo "$JOPLIN_CONFIG_JSON does not exist; using default Joplin config"
 fi
 
+# joplin server start &
+
 exec "$@"

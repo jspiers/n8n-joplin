@@ -1,7 +1,11 @@
 version: "3"
 services:
   joplin:
-    build: .
+    build:
+      context: .
+      args:
+        N8N_VERSION: "0.107.0"
+        JOPLIN_VERSION: "1.6.4"
     image: jspiers/joplin-client
     volumes:
       - ./joplin-config.json:/secrets/joplin-config.json
@@ -9,7 +13,6 @@ services:
         source: joplin-data
         target: /home/node/.config/joplin
     ports:
-      - "41187:41187"
-
+      - "41184:41184"
 volumes:
   joplin-data:
