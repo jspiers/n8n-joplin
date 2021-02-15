@@ -5,10 +5,16 @@
 Working towards [https://n8n.io](n8n.io) integration with [Joplin](https://joplinapp.org/)
 
 
-### Usage:
-`docker-compose up --build`
+## Usage:
+`docker-compose up`
+and access n8n by opening a web browser to http://localhost:5678
 
-#### Optional:
+The Joplin web clipper is accessible from within n8n (e.g. for the [HTTP Request node]()) via address http://joplin/notes?token=mysupersecrettoken123
+
+## Example n8n workflow
+From the n8n interface, import `joplin_notes_workflow.json`
+
+## Configuration:
 Add a Joplin configuration JSON file o(i.e. with the contents of a `joplin config --export` from another Joplin instance) to `./joplin-config.json` and it will be loaded via `joplin --import-file` in the docker container.
 
 Sample `joplin-config.json` for S3-based sync:
@@ -19,11 +25,9 @@ Sample `joplin-config.json` for S3-based sync:
   "sync.8.path": "bucket",
   "sync.8.username": "S3ACCESSKEY",
   "sync.8.password": "S3SECRET",
-  "sync.interval": 300,
   "sync.maxConcurrentConnections": 5,
   "sync.resourceDownloadMode": "manual",
   "sync.wipeOutFailSafe": true,
-  "api.port": 41187,
-  "api.token": "abc123"
+  "api.token": "mysupersecrettoken123"
 }
 ```
