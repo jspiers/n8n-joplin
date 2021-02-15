@@ -9,7 +9,7 @@ Working towards [https://n8n.io](n8n.io) integration with [Joplin](https://jopli
 `docker-compose up`
 and access n8n by opening a web browser to http://localhost:5678
 
-The Joplin web clipper is accessible from within n8n (e.g. for the [HTTP Request node]()) via address http://joplin/notes?token=mysupersecrettoken123
+The Joplin web clipper is accessible from within n8n (e.g. for the [HTTP Request node](https://docs.n8n.io/nodes/n8n-nodes-base.httpRequest/)) via address http://joplin/notes?token=mysupersecrettoken123
 
 ## Example n8n workflow
 From the n8n interface, import `joplin_notes_workflow.json`
