@@ -2,7 +2,7 @@
 
 *WIP*
 
-Working towards [https://n8n.io](n8n.io) integration with [Joplin](https://joplinapp.org/)
+Working towards [n8n.io](https://n8n.io) integration with [Joplin](https://joplinapp.org/)
 
 
 ## Usage:
