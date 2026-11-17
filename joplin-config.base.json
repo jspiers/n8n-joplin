@@ -1,0 +1,8 @@
+{
+  "api.port": 41184,
+  "sync.target": 8,
+  "sync.interval": 300,
+  "sync.maxConcurrentConnections": 5,
+  "sync.resourceDownloadMode": "manual",
+  "sync.wipeOutFailSafe": true
+}

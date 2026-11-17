@@ -32,47 +32,45 @@ calls the Joplin web clipper at `http://joplin/notes?token=<api.token>`.
 
 ## Secrets
 
-Nothing here is stored in plaintext:
+`secrets/app.sops.env` is the single source of truth for this stack, so a value
+two services share is stored once:
 
-- `secrets/app.sops.env` — POP3/S3 values, exported into the shell by `.envrc`.
-  No service in `docker-compose.yml` consumes them yet.
-- `secrets/joplin.sops.json` — the Joplin profile config (sync target, S3
-  credentials, API token). `.envrc` decrypts it and exports
-  `JOPLIN_CONFIG_JSON_B64`; the container decodes that into tmpfs, so no config
-  file exists on this machine or on the Docker daemon's host.
+- `S3_*` — the Joplin sync target's credentials.
+- `JOPLIN_API_TOKEN` — the clipper API token.
+- `POP3_*`, `GETMAIL_OPTS`, `DEFAULT_TITLE_PREFIX`, `*_NOTEBOOK` — mail-to-notes
+  values; no service in `docker-compose.yml` consumes them yet.
 
-Both files are encrypted to `&user_jeff` plus both recovery masters (see
+`.envrc` decrypts that file, then builds the Joplin config from it:
+`joplin-config.base.json` holds the non-secret settings, the secrets are merged in
+with `jq`, and the result is exported as `JOPLIN_CONFIG_JSON_B64`. The container
+decodes it into tmpfs, so no config file exists on this machine or on the Docker
+daemon's host.
+
+That also means the credentials are already in the shell environment for anything
+else in the stack that needs them — pass `S3_KEY`/`S3_SECRET` through in
+`docker-compose.yml` rather than adding a second encrypted copy.
+
+The file is encrypted to `&user_jeff` plus both recovery masters (see
 `.sops.yaml`), so the user age key is enough for day-to-day edits:
 
 ```bash
-sops secrets/joplin.sops.json
 sops secrets/app.sops.env
 ```
 
 Decryption uses `~/.config/sops/age/keys.txt`, installed on macOS by nix-darwin
 from the `nix-secrets` flake input.
 
-`api.token` is still the sample value from the upstream documentation; change it
-in `secrets/joplin.sops.json` and in the workflow URL together.
+`JOPLIN_API_TOKEN` is still the sample value from the upstream documentation;
+change it here and in the workflow URL together.
 
 ## Configuration
 
-The Joplin service's config is whichever JSON `joplin config --export` produces,
-encrypted as `secrets/joplin.sops.json`. There is no `joplin-config.json` in the
-working tree; edit the encrypted file with `sops`.
+Joplin's config is the JSON that `joplin config --export` produces, split in two:
 
-Sample (S3-based sync):
+- `joplin-config.base.json` (committed) — settings that are not secret, such as
+  `sync.target`, `sync.interval` and the concurrency/fallback flags.
+- the encrypted values in `secrets/app.sops.env` — `sync.8.url/path/username/password`
+  and `api.token`, mapped to their Joplin names by `.envrc`.
 
-```json
-{
-  "sync.target": 8,
-  "sync.8.url": "https://s3.us-east-1.wasabisys.com",
-  "sync.8.path": "bucket",
-  "sync.8.username": "S3ACCESSKEY",
-  "sync.8.password": "S3SECRET",
-  "sync.maxConcurrentConnections": 5,
-  "sync.resourceDownloadMode": "manual",
-  "sync.wipeOutFailSafe": true,
-  "api.token": "mysupersecrettoken123"
-}
-```
+Edit the base file for behavioural changes and `sops secrets/app.sops.env` for
+credentials. There is no plaintext config in the working tree.
