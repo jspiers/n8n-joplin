@@ -1,4 +1,3 @@
-version: "3"
 services:
   n8n:
     image: n8nio/n8n:0.107.0
@@ -9,9 +8,12 @@ services:
         source: n8n-data
         target: /home/node/.n8n
   joplin:
-    image: jspiers/headless-joplin:1.6.4-node-14.15.5
+    image: jspiers/headless-joplin:2.13.2-node-20.11.1
+    environment:
+      # `.envrc` decrypts secrets/joplin.sops.json into this variable; the image
+      # decodes it to tmpfs, so no config file exists on either machine.
+      JOPLIN_CONFIG_JSON_B64: ${JOPLIN_CONFIG_JSON_B64:?run this from a direnv-enabled shell; see README}
     volumes:
-      - ./joplin-config.json:/secrets/joplin-config.json
       - type: volume
         source: joplin-data
         target: /home/node/.config/joplin
