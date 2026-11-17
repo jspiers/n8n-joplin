@@ -50,15 +50,20 @@ That also means the credentials are already in the shell environment for anythin
 else in the stack that needs them — pass `S3_KEY`/`S3_SECRET` through in
 `docker-compose.yml` rather than adding a second encrypted copy.
 
-The file is encrypted to `&user_jeff` plus both recovery masters (see
-`.sops.yaml`), so the user age key is enough for day-to-day edits:
+The file is encrypted with [sops](https://getsops.io/) to the maintainer's age
+key plus recovery keys (see `.sops.yaml`), so editing it needs only that private
+key:
 
 ```bash
 sops secrets/app.sops.env
 ```
 
-Decryption uses `~/.config/sops/age/keys.txt`, installed on macOS by nix-darwin
-from the `nix-secrets` flake input.
+sops reads `~/.config/sops/age/keys.txt` by default; set `SOPS_AGE_KEY_FILE` if
+your key lives elsewhere.
+
+If you are not the maintainer, the encrypted values here are not usable: point
+`.sops.yaml` at your own recipients and re-encrypt, or start `secrets/app.sops.env`
+from scratch with the variables listed above.
 
 `JOPLIN_API_TOKEN` is still the sample value from the upstream documentation;
 change it here and in the workflow URL together.
