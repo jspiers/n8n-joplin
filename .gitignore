@@ -1,3 +1,5 @@
 .env
+.env.local
+.env.*.local
 .n8n
 joplin-config.json

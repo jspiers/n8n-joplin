@@ -11,6 +11,29 @@ and access n8n by opening a web browser to http://localhost:5678
 
 The Joplin web clipper is accessible from within n8n (e.g. for the [HTTP Request node](https://docs.n8n.io/nodes/n8n-nodes-base.httpRequest/)) via address http://joplin/notes?token=mysupersecrettoken123
 
+## Secrets
+
+`.env` is not stored in this repository. The POP3/S3 values live encrypted in
+`secrets/app.sops.env`; recipients and creation rules are in `.sops.yaml`.
+
+- **Interactive shell**: run `direnv allow` once here. `.envrc` decrypts the
+  file in memory and exports the variables; nothing is written to disk.
+- **One-shot**: `sops exec-env secrets/app.sops.env '<command>'` (the command
+  must be one quoted argument).
+- **Edit**: `sops secrets/app.sops.env`
+
+Decryption uses `~/.config/sops/age/keys.txt`, installed on macOS by nix-darwin
+from the `nix-secrets` flake input.
+
+Two caveats in the current state:
+
+- `docker-compose.yml` does not pass any of these variables into the containers,
+  so `.env` was never consumed at runtime; the S3 credentials it duplicates are
+  read from `joplin-config.json`.
+- `joplin-config.json` is still a local, gitignored plaintext file because the
+  container mounts it directly. It moves to `secrets/joplin-config.sops.json`
+  with `sops exec-file` when the images are next updated.
+
 ## Example n8n workflow
 From the n8n interface, import `joplin_notes_workflow.json`
 
